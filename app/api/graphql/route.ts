@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
 
+// GraphQL схема
 const typeDefs = /* GraphQL */ `
   type User {
     id: String!
@@ -47,7 +48,14 @@ const resolvers = {
   },
 };
 
+// Apollo Server
 const server = new ApolloServer({ typeDefs, resolvers });
 
-export const GET = startServerAndCreateNextHandler(server);
-export const POST = startServerAndCreateNextHandler(server);
+// В Next.js App Router потрібно робити async функції GET/POST
+export const GET = async (request: Request) => {
+  return startServerAndCreateNextHandler(server)(request);
+};
+
+export const POST = async (request: Request) => {
+  return startServerAndCreateNextHandler(server)(request);
+};
