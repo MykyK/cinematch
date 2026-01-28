@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  sessions  Session[] @relation("SessionParticipants")
+  swipes    Swipe[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  users     User[]   @relation("SessionParticipants")
+  swipes    Swipe[]
+  matches   Match[]
+}
+
+model Movie {
+  id        Int      @id
+  title     String
+  posterUrl String?
+  year      Int?
+
+  swipes    Swipe[]
+  matches   Match[]
+}
+
+model Swipe {
+  id        String   @id @default(uuid())
+  userId    String
+  movieId   Int
+  sessionId String
+  value     SwipeValue
+  createdAt DateTime @default(now())
+
+  user      User    @relation(fields: [userId], references: [id])
+  movie     Movie   @relation(fields: [movieId], references: [id])
+  session   Session @relation(fields: [sessionId], references: [id])
+
+  @@unique([userId, movieId, sessionId])
+}
+
+model Match {
+  id        String   @id @default(uuid())
+  movieId   Int
+  sessionId String
+  createdAt DateTime @default(now())
+
+  movie     Movie   @relation(fields: [movieId], references: [id])
+  session   Session @relation(fields: [sessionId], references: [id])
+
+  @@unique([movieId, sessionId])
+}
+
+enum SwipeValue {
+  LIKE
+  DISLIKE
+}
